@@ -1,0 +1,6 @@
+BeautifulSoup==3.2.1
+dpkt==1.8.7
+pcapy==0.10.10
+pypcap==1.1.5
+requests==2.9.1
+scapy==2.3.2

@@ -1,10 +1,13 @@
-import sys
-import requests
-import dpkt
-import copy
-from scapy.all import *
 from BeautifulSoup import BeautifulSoup
+import copy
+import dpkt
+import requests
+import sys
 
+# necessary for accessing libdnet from within a virtualenv on OSX
+if sys.platform == "darwin":
+  import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")
+from scapy.all import *
 
 session_ids =set() # a global set for all session ids
 cur_packet = ''
