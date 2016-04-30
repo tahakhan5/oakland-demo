@@ -1,4 +1,4 @@
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 import copy
 import dpkt
 import requests
@@ -7,6 +7,7 @@ import sys
 # necessary for accessing libdnet from within a virtualenv on OSX
 if sys.platform == "darwin":
   import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")
+
 from scapy.all import *
 
 session_ids =set() # a global set for all session ids
@@ -41,7 +42,7 @@ def make_request(cookie):
 	add_headers["Cookie"] = cookie
 	r = requests.get(url, headers=add_headers)
 	resp = r.content
-	soup = BeautifulSoup(resp)
+	soup = BeautifulSoup(resp, 'lxml')
 
 
 	name_div = soup.findAll("div", { "class" : "gb_Cb"})
