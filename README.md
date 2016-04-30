@@ -10,3 +10,8 @@ on OSX:
 ```
   brew install --with-python libdnet
 ```
+
+## Usage
+```
+  python google_cookie.py [listening interface]
+```
