@@ -43,7 +43,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(f.read())
                 f.close()
         else:
-            self.send_error(404,'Please try again with signed in with your google account')
+            self.send_error(404,'Please try again while signed in with your google account')
         return
 
 
