@@ -1,18 +1,18 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from SocketServer import ThreadingMixIn
 import threading
-from os import curdir, sep
 import os
-
 
 class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-
-        user_html = self.client_address[0].replace(".","")+".html"
+        user_html = self.client_address[0].replace(".","").replace(":","")+".html"
+        self.path = self.path.split("?")[0]
+        
         files = [f for f in os.listdir('.') if os.path.isfile(f)]
-
+        
         if user_html in files:
+    		    
             if self.path == "/":
                 self.path = self.path+user_html
 
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     abs_path =  os.path.abspath(".")
     os.chdir(abs_path+"/client_files/")
 
-    server = ThreadedHTTPServer(('localhost', 8080), Handler)
+    server = ThreadedHTTPServer(('', 8000), Handler)
     print 'Starting server, use <Ctrl-C> to stop'
     server.serve_forever()

