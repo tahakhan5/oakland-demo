@@ -133,6 +133,8 @@ def extract_cookie(packet):
 					del	user_packet[user_key]
 
 def main():
+
+	subprocess_cmd("mkdir 777 client_files") #create dir for storing files
 	interface = sys.argv[1]
 	print interface
 	sniff(iface=interface, prn=extract_cookie)
