@@ -17,6 +17,7 @@ on OSX:
 Run the following commands on startup to add iptable rules
 
 `iptables -t nat -D PREROUTING 1`
+
 `iptables -t nat -A PREROUTING -p tcp --dport 80 -i br-lan -j DNAT --to 172.16.42.1:8000`
 
 
