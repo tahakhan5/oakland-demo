@@ -19,7 +19,7 @@ on OSX:
 1. Connect to the `Free_WiFi` access point.
 1. In a browser go to `172.16.42.1:1471` and login.
 1. Under the networking tab, enable `client AP` by scanning and connecting to a local WiFi for Internet access.
-1. Under the configuration tab, enable the the landing page (disabled on default after device reboot.
+1. Under the configuration tab, enable the the landing page (disabled on default after device reboot).
 1. Now, ssh into the WiFi Pineaapple
 1. run the cookie capturing script with using the command below. Default interface for listening is `wlan0`
 
