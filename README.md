@@ -14,6 +14,12 @@ on OSX:
 ```
 
 ## Initialization on WiFi Pineapple
+Run the following commands on startup to add iptable rules
+
+`iptables -t nat -D PREROUTING 1`
+
+`iptables -t nat -A PREROUTING -p tcp --dport 80 -i br-lan -j DNAT --to 172.16.42.1:8000`
+
 
 1. Turn on the WiFi Pineapple and wait for the blue light to go stable.
 1. Connect to the `Free_WiFi` access point.
