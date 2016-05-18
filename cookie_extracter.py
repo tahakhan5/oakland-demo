@@ -101,13 +101,13 @@ def extract_cookie(src_ip, src_port, payload):
 				if "cookie: "in field.lower(): #if cookie is found in the header
 		 			cookie_str = field
 					s_tok = extract_google_stok(field)
-					print "cookie found"
+					#print "cookie found"
 					break
 
 			if s_tok not in session_ids and s_tok != None:
 	  			session_ids.update([s_tok])
 	 			temp_cookie = cookie_str.split(": ")[1]
-	 			print temp_cookie
+	 			#print temp_cookie
 	 			
 	 			cookie_dict[src_ip] = temp_cookie
 
