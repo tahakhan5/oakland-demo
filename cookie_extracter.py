@@ -353,7 +353,7 @@ def main():
 	server_thread.daemon = True   
 	server_thread.start()
 
-	Create a raw socket for listening to all packets
+	#Create a raw socket for listening to all packets
 	interface = sys.argv[1]
 	cookie_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
 	cookie_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2**30)
