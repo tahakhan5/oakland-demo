@@ -350,24 +350,24 @@ def main():
 	#run_response_server()
 	#Run the response server in a parallel thread
 	server_thread = threading.Thread(target=run_response_server, args=())
-	#server_thread.daemon = True   
+	server_thread.daemon = True   
 	server_thread.start()
 
-	# Create a raw socket for listening to all packets
-	# interface = sys.argv[1]
-	# cookie_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
-	# cookie_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2**30)
-	# cookie_socket.bind((interface, ETH_P_ALL))
+	Create a raw socket for listening to all packets
+	interface = sys.argv[1]
+	cookie_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+	cookie_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2**30)
+	cookie_socket.bind((interface, ETH_P_ALL))
 
-	# # Continously listen for packets and parse them
-	# print "now listening on: "+interface
-	# while True:
+	# Continously listen for packets and parse them
+	print "now listening on: "+interface
+	while True:
 
-	# 	pkt, sa_ll = cookie_socket.recvfrom(MTU)
-	# 	packet_elements = packet_parser(pkt)
+		pkt, sa_ll = cookie_socket.recvfrom(MTU)
+		packet_elements = packet_parser(pkt)
 
-	# 	if packet_elements != None:
-	# 		extract_cookie(packet_elements[0], packet_elements[1], packet_elements[2])
+		if packet_elements != None:
+			extract_cookie(packet_elements[0], packet_elements[1], packet_elements[2])
 
 if __name__ == '__main__':
 	main()
