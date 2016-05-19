@@ -245,7 +245,7 @@ def run_response_server():
 									"</span></strong></u></span></td></tr><tr><td style=\"text-align:justify\"><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"width:500px\"><tbody><tr><td>"\
 									"<img src=\"usr_cookie_attack_photo.jpg\" alt=\"profile_picture\" style=\"height:150px; width:150px\" /></td><td "\
 									"style=\"text-align:left\"><span style=\"font-size:20px\">&nbsp; &nbsp;&nbsp;</span></td><td><table align=\"left\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"line-height:1.6; width:300px\">"\
-									"<tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong"+name+"</strong></span></span></p></td></tr><tr>"\
+									"<tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong>"+name+"</strong></span></span></p></td></tr><tr>"\
 									"<td style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+email+"</span></span></td></tr><tr><td style=\"text-align:left\">"\
 									"<p style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+home+"</span></span></p></td></tr></tbody></table><p>"\
 									"&nbsp;</p></td></tr></tbody></table></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-size:28px\">"\
