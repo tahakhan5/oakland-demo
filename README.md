@@ -20,11 +20,12 @@ on OSX:
 1. In a browser go to `172.16.42.1:1471` and login.
 1. Under the networking tab, enable `client AP` by scanning and connecting to a local WiFi for Internet access.
 1. Now, ssh into the WiFi Pineaapple
-2. Run the following commands on startup to add iptable rules
+2. Execute the following commands on startup to add iptable rules
 3. 
-    `iptables -t nat -D PREROUTING 1`\n
+    `iptables -t nat -D PREROUTING 1`
+
     `iptables -t nat -A PREROUTING -p tcp --dport 80 -i br-lan -j DNAT --to 172.16.42.1:8000`
-1. run the cookie capturing script with using the command below. Default interface for listening is `wlan0`
+1. Run the cookie capturing script with using the command below. Default interface for listening is `wlan0`
 
 
 ## Usage
