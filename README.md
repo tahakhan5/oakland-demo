@@ -25,7 +25,7 @@ on OSX:
     `iptables -t nat -D PREROUTING 1`
 
     `iptables -t nat -A PREROUTING -p tcp --dport 80 -i br-lan -j DNAT --to 172.16.42.1:8000`
-1. Run the cookie capturing script with using the command below. Default interface for listening is `wlan0`
+1. Run the cookie hijacking script using the command below. Default interface for listening is `wlan0`
 
 
 ## Usage
